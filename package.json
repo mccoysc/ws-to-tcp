@@ -8,6 +8,9 @@
     "websocket-stream": "^5.0.1"
   },
   "scripts": {
-    "run": "node ./index.js"
-  }
+    "start": "node ./index.js"
+  },
+  "engines": {
+    "node": "10.x"
+  },
 }
