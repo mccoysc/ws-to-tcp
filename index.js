@@ -5,6 +5,11 @@ var websocket = require('websocket-stream')
 var pump = require('pump')
 var port=process.env.PORT||443
 var to=process.env.TO
+try{
+  to=JSON.parse(to)
+}catch(err){
+  to=null
+}
 if(!to){
   console.log("need env TO")
   process.exit(2)
