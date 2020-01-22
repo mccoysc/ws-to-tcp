@@ -10,8 +10,9 @@ try{
 }catch(err){
   to=null
 }
-if(!to){
-  console.log("need env TO")
+port=port/1
+if(!to || isNaN(port)){
+  console.log("need env TO and PORT")
   process.exit(2)
 }
 websocket.createServer({port: port}, handle)
