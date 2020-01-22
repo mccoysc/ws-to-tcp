@@ -2,23 +2,15 @@
 
 var net = require('net')
 var websocket = require('websocket-stream')
-var minimist = require('minimist')
 var pump = require('pump')
-
-var argv = minimist(process.argv.slice(2), {
-  alias: {
-    from: 'f',
-    to: 't'
-  }
-})
-
-if (!argv.from || !argv.to) {
-  console.error('Usage: ws-to-tcp --from [ws-port] --to [tcp-port]')
-  process.exit(1)
+var port=process.env.PORT||443
+var to=process.env.TO
+if(!to){
+  console.log("need env TO")
+  process.exit(2)
 }
-
-websocket.createServer({port: argv.from}, handle)
+websocket.createServer({port: port}, handle)
 
 function handle (stream) {
-  pump(stream, net.connect(argv.to), stream)
+  pump(stream, net.connect(to), stream)
 }
