@@ -37,6 +37,8 @@ function handle(stream, request) {
       pump(stream, net.connect(qs.decode(url.search.substr(1))), stream)
     } else if (to) {
       pump(stream, net.connect(to), stream)
+    } else {
+      throw new Error("need target connection params,just like 'wss://1.1.1.1/port=443&host=2.2.2.2' to proxy to 2.2.2.2:443")
     }
   } catch (err) {
     console.log("handle stream request err:", JSON.stringify(err))
