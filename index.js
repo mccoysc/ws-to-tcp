@@ -11,8 +11,8 @@ try {
   to = null
 }
 port = port / 1
-if (!to || isNaN(port)) {
-  console.log("need env TO and PORT")
+if (isNaN(port)) {
+  console.log("need env PORT")
   process.exit(2)
 }
 websocket.createServer({
@@ -35,10 +35,11 @@ function handle(stream, request) {
   try {
     if (url && url.search) {
       pump(stream, net.connect(qs.decode(url.search.substr(1))), stream)
-    } else {
+    } else if (to) {
       pump(stream, net.connect(to), stream)
     }
   } catch (err) {
     console.log("handle stream request err:", JSON.stringify(err))
+    stream ? stream.end(JSON.stringify(err)) : null
   }
 }
