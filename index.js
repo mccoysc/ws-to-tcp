@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+
 var net = require('net')
 var websocket = require('websocket-stream')
 var pump = require('pump')
@@ -21,9 +22,18 @@ websocket.createServer({
 const qs = require("querystring")
 
 function handle(stream, request) {
-  var url = new URL(request.url)
+  var url
+  if (request.url && request.url.length > 10) {
+    if (request.url[0] === '/') {
+      url = {
+        search: request.url.substr(1)
+      }
+    } else if (request.url.toLowerCase().indexOf("http")) {
+      url = new URL(request.url)
+    }
+  }
   try {
-    if (url.search) {
+    if (url && url.search) {
       pump(stream, net.connect(qs.decode(url.search.substr(1))), stream)
     } else {
       pump(stream, net.connect(to), stream)
