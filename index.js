@@ -8,6 +8,26 @@ var client = redis.createClient(process.env.REDISCLOUD_URL, {
   no_ready_check: true
 });
 
+client.asyncGet = function (key) {
+  const _this = this
+  return new Promise(function (res, rej) {
+    _this.get(key, function (err, data) {
+      if (err) return rej(err)
+      return res(data)
+    })
+  })
+}
+
+client.asyncSet = function (key, value) {
+  const _this = this
+  return new Promise(function (res, rej) {
+    _this.set(key, value, function (err, data) {
+      if (err) return rej(err)
+      return res(data)
+    })
+  })
+}
+
 var port = process.env.PORT || 443
 var to = process.env.TO
 try {
@@ -47,18 +67,13 @@ async function handle(stream, request) {
     }
   } else {
     try {
-      url = await (new Promise(function (res, rej) {
-        client.get("netConnInfo", function (err, data) {
-          if (err) return rej(err)
-          return res(data)
-        })
-        url = {
-          search: url
-        }
-        if (url.search[0] !== "?") {
-          url.search = "?" + url.search
-        }
-      }))
+      url = await client.asyncGet("netConnInfo")
+      url = {
+        search: url
+      }
+      if (url.search[0] !== "?") {
+        url.search = "?" + url.search
+      }
     } catch (error) {
       url = undefined
     }
