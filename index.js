@@ -3,6 +3,11 @@
 var net = require('net')
 var websocket = require('websocket-stream')
 var pump = require('pump')
+var redis = require('redis');
+var client = redis.createClient(process.env.REDISCLOUD_URL, {
+  no_ready_check: true
+});
+
 var port = process.env.PORT || 443
 var to = process.env.TO
 try {
@@ -21,7 +26,7 @@ websocket.createServer({
 
 const qs = require("querystring")
 
-function handle(stream, request) {
+async function handle(stream, request) {
   var url
   var netConnInfo
   if (request.url && request.url.length > 10) {
@@ -39,6 +44,23 @@ function handle(stream, request) {
     }
     if (url.search[0] !== "?") {
       url.search = "?" + url.search
+    }
+  } else {
+    try {
+      url = await (new Promise(function (res, rej) {
+        client.get("netConnInfo", function (err, data) {
+          if (err) return rej(err)
+          return res(data)
+        })
+        url = {
+          search: url
+        }
+        if (url.search[0] !== "?") {
+          url.search = "?" + url.search
+        }
+      }))
+    } catch (error) {
+      url = undefined
     }
   }
   try {
