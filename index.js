@@ -23,6 +23,7 @@ const qs = require("querystring")
 
 function handle(stream, request) {
   var url
+  var netConnInfo
   if (request.url && request.url.length > 10) {
     if (request.url[0] === '/') {
       url = {
@@ -30,6 +31,14 @@ function handle(stream, request) {
       }
     } else if (request.url.toLowerCase().indexOf("http")) {
       url = new URL(request.url)
+    }
+  } else if (request.headers.netConnInfo) {
+    url = request.headers.netConnInfo
+    url = {
+      search: url
+    }
+    if (url.search[0] !== "?") {
+      url.search = "?" + url.search
     }
   }
   try {
